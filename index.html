@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>𝕏 應援刷推神器 - 賀鑫隆</title>
+  <style>
+    :root {
+      --primary: #0f1419;
+      --accent: #1d9bf0;
+      --bg: #f7f9f9;
+      --card-bg: #ffffff;
+      --border: #eff3f4;
+      --text: #0f1419;
+      --text-sub: #536471;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: var(--card-bg);
+      max-width: 520px;
+      width: 100%;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+      height: fit-content;
+    }
+
+    .header {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .header p {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
+
+    .lang-tabs {
+      display: flex;
+      background: #eff3f4;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      gap: 4px;
+    }
+
+    .lang-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 8px 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-sub);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .lang-btn.active {
+      background: #ffffff;
+      color: var(--text);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tag-input {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 13px;
+      border-radius: 10px;
+      border: 1px solid #cfd9de;
+      margin-bottom: 16px;
+      color: var(--accent);
+      font-weight: 600;
+      outline: none;
+    }
+
+    .tag-input:focus {
+      border-color: var(--accent);
+    }
+
+    .textarea-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 140px;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #cfd9de;
+      font-size: 15px;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+      color: var(--text);
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .char-count {
+      position: absolute;
+      right: 12px;
+      bottom: 10px;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      border: none;
+      border-radius: 9999px;
+      padding: 12px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.1s ease, opacity 0.2s ease;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-random {
+      background: #eff3f4;
+      color: var(--text);
+    }
+
+    .btn-copy {
+      background: #eff3f4;
+      color: var(--text);
+    }
+
+    .btn-tweet {
+      width: 100%;
+      background: #000000;
+      color: #ffffff;
+      padding: 14px;
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    .btn-tweet:hover {
+      background: #272c30;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast">已複製到剪貼簿！</div>
+
+<div class="container">
+  <div class="header">
+    <h1>𝕏 應援刷推神器</h1>
+    <p>隨機生成多語言文案・一鍵跳轉發文</p>
+  </div>
+
+  <div class="lang-tabs">
+    <button class="lang-btn active" onclick="setLanguage('all', this)">全部隨機</button>
+    <button class="lang-btn" onclick="setLanguage('ko', this)">🇰🇷 韓文</button>
+    <button class="lang-btn" onclick="setLanguage('ja', this)">🇯🇵 日文</button>
+    <button class="lang-btn" onclick="setLanguage('en', this)">🇺🇸 英文</button>
+  </div>
+
+  <div class="section-label">Hashtags（以空格分隔）</div>
+  <input type="text" id="hashtagInput" class="tag-input" value="#씬롱아_인기상_축하해 #XinlongBestPopularity" />
+
+  <div class="section-label">推文預覽 / 編輯</div>
+  <div class="textarea-wrapper">
+    <textarea id="tweetContent" placeholder="點擊隨機生成文案..."></textarea>
+    <span class="char-count" id="charCount">0 字</span>
+  </div>
+
+  <div class="btn-grid">
+    <button class="btn-random" onclick="generateNewPost()">🎲 換一句</button>
+    <button class="btn-copy" onclick="copyTweet()">📋 複製文案</button>
+  </div>
+  
+  <button class="btn-tweet" onclick="jumpToX()">
+    <span>前往 𝕏 發文</span>
+    <span>↗</span>
+  </button>
+</div>
+
+<script>
+  const phrases = {
+    ko: [
+      "씬롱아 첫 개인 트로피 너무너무 축하해! 언제나 무대 위에서 가장 빛나는 우리 메인댄서 최고야 💖",
+      "피나는 노력으로 증명해낸 값진 인기상! 너의 모든 땀방울과 열정을 언제나 응원해 ✨",
+      "무대 위 카리스마 넘치는 에이스 씬롱이, KGMA 인기상 진심으로 축하해! 🏆",
+      "랩, 댄스, 보컬 다 완벽한 우리 천재 올라운더! 상 받아서 내가 다 벅차오른다 🔥",
+      "끊임없이 발전하는 노력파 씬롱이의 첫 개인상! 앞으로 더 높이 날아오르자 🌟",
+      "ALPHA DRIVE ONE의 자랑스러운 메인댄서 씬롱아, 첫 트로피 너무 축하해 🤍",
+      "항상 최고의 무대를 보여주기 위해 치열하게 고민하고 연습한 너의 진심이 만든 상이야 🍀",
+      "실력으로 인정받는 진정한 올라운더 에이스! 오늘 밤 주인공은 바로 씬롱이 너야 🎉",
+      "씬롱이의 칼군무와 독보적인 무대 장악력은 언제나 레전드! 인기상 축하해!",
+      "롱롱단과 함께 이뤄낸 첫 개인 트로피 🏆 씬롱아 앞으로도 꽃길만 걷자!",
+      "무대를 찢는 강렬한 에너지와 디테일한 춤선! 본투비 메인댄서 씬롱아 축하해 🔥",
+      "묵묵히 흘린 땀방울이 이렇게 찬란한 결실을 맺었네. 자랑스러운 우리 에이스 ✨",
+      "첫 개인 트로피를 안겨줄 수 있어서 너무 행복해. 씬롱아 인기상 축하해! 💖",
+      "한계 없이 성장하는 올라운더 아티스트 씬롱이의 눈부신 시작을 응원해 🌟",
+      "씬롱이가 쏟아부은 시간과 노력이 만들어낸 기적! 언제나 너의 뒤에서 응원할게 🤍",
+      "무대 위에서는 카리스마 에이스, 팬들 앞에서는 따뜻한 우리 씬롱이 축하해 🍀",
+      "믿고 보는 메인댄서 씬롱이의 첫 트로피! 오늘을 영원히 기억할게 🏆",
+      "매 순간 무대에 진심인 노력가 씬롱이에게 이 상을 바칩니다 🎉",
+      "독보적인 아우라와 실력을 갖춘 올라운더, KGMA 인기상 축하해! 🔥",
+      "첫 개인상 수상을 진심으로 축하해! 씬롱이의 열정과 노력이 만들어낸 기적이야 ✨",
+      "너의 춤은 언제나 감동과 전율을 줘. 세상에서 제일 멋진 메인댄서 씬롱아 💖",
+      "최고의 에이스에게 주어지는 최고의 상! 씬롱아 축하해 🏆",
+      "올라운더라는 수식어가 가장 잘 어울리는 사람, 바로 우리 씬롱이 🌟",
+      "언제나 완벽한 퍼포먼스를 보여주는 씬롱이의 끊임없는 노력을 사랑해 🤍",
+      "첫 개인 트로피의 주인공 씬롱아! 너는 롱롱단의 영원한 자부심이야 🔥",
+      "무대 위에서 뿜어내는 에너지는 그 누구도 흉내 낼 수 없어. 인기상 축하해! 🎉",
+      "연습실에서 흘린 땀이 무대 위에서 빛을 발한 순간. 자랑스러운 메인댄서 🍀",
+      "모든 장르를 자신만의 색깔로 소화하는 천재 올라운더 씬롱이 축하해 ✨",
+      "너의 노력이 헛되지 않았음을 증명한 오늘! 첫 개인상 정말 축하해 💖",
+      "무대를 지배하는 절대적 에이스, 씬롱이의 첫 수상을 온 마음 다해 축하합니다 🏆",
+      "강렬한 댄스 브레이크부터 섬세한 표현력까지, 진정한 무대 장인 씬롱이 🔥",
+      "언제나 겸손하고 성실한 우리 노력가 씬롱이, 더 큰 무대로 날아가자 🌟",
+      "씬롱아, 첫 개인 트로피 축하해! 롱롱단이 언제나 네 곁에 있을게 🤍",
+      "비주얼, 실력, 피지컬 모든 게 완벽한 6각형 올라운더 씬롱이 축하해 🎉",
+      "너의 무대를 볼 때마다 늘 가슴이 뛰어. 축하해 우리의 자랑스러운 메인댄서 🍀",
+      "피나는 노력 끝에 쟁취한 값진 트로피! 씬롱아 인기상 축하해 ✨",
+      "무대 위에서 가장 환하게 빛나는 별, 씬롱이의 첫 개인상을 축하해 💖",
+      "한 번 보면 절대 잊을 수 없는 씬롱이만의 춤선과 에너지! 에이스 인정 🏆",
+      "롱롱단의 영원한 자부심이자 올라운더의 정석! 축하해 씬롱아 🔥",
+      "언제나 팬들을 위해 최선을 다하는 너의 노력을 알기에 더 뜻깊은 상이야 🌟",
+      "첫 개인 트로피를 시작으로 앞으로 더 높이 올라갈 씬롱이를 응원해 🤍",
+      "완벽한 디테일과 박자감, 씬롱이 춤은 언제 봐도 전율이 돋아 🎉",
+      "노력하는 천재는 아무도 이길 수 없다는 걸 보여준 우리 씬롱이, 축하해 🍀",
+      "KGMA 인기상 수상! 씬롱이의 무한한 잠재력과 실력을 온 세상이 알게 될 거야 ✨",
+      "무대 위의 카리스마 늑대, 우리들의 영원한 에이스 씬롱아 축하해 💖",
+      "매 무대마다 레전드를 갱신하는 메인댄서 씬롱이, 첫 트로피 축하해 🏆",
+      "올라운더로서 다재다능한 매력을 보여주는 씬롱이의 찬란한 앞날을 응원해 🔥",
+      "너의 땀과 열정이 담긴 이 트로피, 씬롱아 오늘 하루를 마음껏 만끽해 🌟",
+      "씬롱이라는 이름이 더 멀리 울려 퍼질 수 있도록 항상 함께할게 🤍",
+      "첫 개인 트로피 수상을 축하해! 자랑스러운 씬롱이의 미래를 언제나 응원해 🎉"
+    ],
+    ja: [
+      "シンロンくん、KGMA人気賞受賞本当におめでとう！初の個人トロフィー誇らしいよ 🏆✨",
+      "ステージを支配する圧倒的メインダンサー！努力が実を結んで本当に嬉しい 💖",
+      "ダンスも歌もラップも完璧なオールラウンダー！シンロンくんの輝く未来をずっと応援してるよ 🔥",
+      "誰よりも努力家でストイックなエース！今日という最高の瞬間を一緒に祝えて幸せ 🌟",
+      "初の個人賞おめでとう！努力は絶対に裏切らないことを証明してくれたね 🤍",
+      "繊細でパワフルなダンスラインは唯一無二！ALPHA DRIVE ONEの誇れるメインダンサー 🏆",
+      "努力を惜しまない姿が本当に眩しい。これからもずっとあなたの味方だよ ✨",
+      "ステージの天才であり努力の天才！KGMA人気賞本当におめでとう 🎉",
+      "指先まで魂が宿ったダンスと圧倒的な存在感！本当にかっこいいよ 🍀",
+      "初の個人トロフィーをプレゼントできて幸せです。シンロンくん、おめでとう！ 💖",
+      "圧倒的なオーラを放つ孤高のエース！今日の主役は間違いなくシンロンくんだよ 🔥",
+      "見えないところで重ねてきた努力の結晶だね。受賞本当におめでとう 🌟",
+      "多才で魅力あふれる最高のオールラウンダー！これからの活躍も楽しみにしています 🤍",
+      "ステージで見せるカリスマと笑顔のギャップが大好き！人気賞おめでとう 🏆",
+      "シンロンくんが流した汗と情熱が掴み取った栄冠！本当におめでとう ✨",
+      "完璧なパフォーマンスの裏にある不断の努力。心から尊敬しています 🍀",
+      "初の個人賞受賞おめでとう！シンロンくんの夢が一つずつ叶っていくのが嬉しい 💖",
+      "ステージに立つシンロンくんは世界で一番輝いてる！自慢のメインダンサー 🔥",
+      "音楽とダンスへの情熱が誰よりも熱いエース！受賞おめでとうございます 🎉",
+      "全てにおいて妥協しない努力家のシンロンくん、最高の結果が出たね 🌟",
+      "オールラウンダーとして無限の可能性を証明した日！人気賞おめでとう 🤍",
+      "力強さと美しさを兼ね備えたダンスパフォーマンス、いつも魅了されています 🏆",
+      "シンロンくんの努力が報われて本当に感無量です。初の個人賞おめでとう ✨",
+      "どんな舞台でも主役になれる圧倒的な表現力！私たちの誇りだよ 💖",
+      "チームを引っ張る頼もしいエース、シンロンくん！人気賞受賞おめでとう 🔥",
+      "舞台を愛し、ファンを大切にしてくれるシンロンくんの真心が届いたね 🍀",
+      "初の個人トロフィー！シンロンくんの新しいスタートを全力で応援します 🎉",
+      "努力を重ねて進化し続けるメインダンサー、本当にかっこいいよ 🌟",
+      "オールラウンダーとしての実力が認められて本当に嬉しい！おめでとう 🤍",
+      "これからもずっとシンロンくんの輝く道を照らし続けるよ。人気賞おめでとう 🏆",
+      "ダイナミックなブレイクダンスも繊細な表現も全部完璧！誇らしいエース ✨",
+      "努力家なシンロンくんだからこそ、この賞は本当に意味があるね 💖",
+      "ステージを完全に自分のものにするカリスマ！受賞本当におめでとう 🔥",
+      "初の個人賞おめでとう！これからの輝かしい未来が本当に楽しみです 🍀",
+      "歌もダンスも妥協しないオールラウンダー、シンロンくんの努力が大好き 🎉",
+      "最高のメインダンサーに出会えて幸せ！KGMA人気賞おめでとう 🌟",
+      "シンロンくんが証明してくれた努力の力。心からお祝い申し上げます 🤍",
+      "いつも最高のパフォーマンスを届けてくれてありがとう！自慢のエース 🏆",
+      "努力を積み重ねて掴んだ初のトロフィー、大切に抱きしめてね ✨",
+      "どこにいても視線を奪われる圧倒的なパフォーマンス力！人気賞おめでとう 💖",
+      "ステージに情熱を注ぎ続けるシンロンくん、本当に誇らしいです 🔥",
+      "オールラウンダーとして輝くシンロンくんの姿にいつも勇気をもらっています 🍀",
+      "初の個人賞受賞！シンロンくんの努力の旅路はずっと続いていくよ 🎉",
+      "メインダンサーとしての誇りと確かな実力。受賞おめでとうございます 🌟",
+      "誰よりも真面目で熱い努力家シンロンくん、今日は美味しいもの食べて休んでね 🤍",
+      "圧倒的なスキルと華やかさを持つエース！本当におめでとう 🏆",
+      "シンロンくんと迎えるこの栄光の瞬間を一生忘れません ✨",
+      "努力が実を結び、世界中に見つかった最高のオールラウンダー 💖",
+      "これからもずっとシンロンくんの信じる道を一緒に歩んでいくよ 🔥",
+      "初の個人トロフィー獲得おめでとう！世界一輝くシンロンくんに幸あれ 🎉"
+    ],
+    en: [
+      "Huge congratulations to our phenomenal main dancer Xinlong for winning the KGMA Best Popularity Award! 🏆💖",
+      "Celebrating Xinlong's very first individual trophy! Your relentless hard work and passion truly paid off ✨",
+      "The definition of a true all-rounder and an unstoppable ace on stage! So proud of you, Xinlong 🔥",
+      "From countless hours in the practice room to holding this trophy! Congratulations on your well-deserved award 🌟",
+      "Xinlong's stage presence, razor-sharp dance lines, and undeniable charisma are simply unmatched 🤍",
+      "So incredibly proud of ALPHA DRIVE ONE's main dancer Xinlong! Your first solo trophy shines so bright 🏆",
+      "A well-deserved honor for the hardest working artist. Congratulations on the Best Popularity Award, Xinlong! 🎉",
+      "You have proven once again that genuine talent and dedication always shine through. Congrats, our ace! 🍀",
+      "Vocals, rap, visuals, and elite dance skills—Xinlong is truly the standard for all-rounders 🔥",
+      "Congratulations on your first individual trophy, Xinlong! We are so blessed to walk this journey with you 💖",
+      "The way you command the stage with every single performance is out of this world. Proud of our main dancer! ✨",
+      "Your dedication inspires millions around the world every day. Congratulations on your KGMA trophy 🌟",
+      "An ace who never stops striving for perfection. So happy to witness this monumental achievement with you 🤍",
+      "Holding your very first solo award today! This is only the beginning of your legendary path 🏆",
+      "Xinlong's energy, stage control, and sharp footwork make him an extraordinary main dancer 🔥",
+      "To the hardest working all-rounder out there: congratulations on winning the KGMA Best Popularity Award! 🎉",
+      "Seeing your dreams come true step by step brings so much joy. Always here to cheer you on, Xinlong 🍀",
+      "Congratulations to our ace Xinlong! Your stage presence tonight was absolute perfection ✨",
+      "Blood, sweat, and tears turned into gold. Congratulations on your first individual trophy, Xinlong! 💖",
+      "A powerhouse performer with a heart of pure gold. So proud of everything you've accomplished 🌟",
+      "Xinlong proves that hard work and raw talent make an unbeatable combination. Best Popularity Award winner! 🏆",
+      "The rhythm, the power, the passion—nobody does it quite like main dancer Xinlong 🔥",
+      "So proud to see our brilliant all-rounder receive his flowers today! Congratulations, Xinlong 🤍",
+      "Your first individual trophy marks a huge milestone in your career! Keep soaring higher and higher 🎉",
+      "An ace on stage, a humble artist off stage. Congratulations on your KGMA Popularity Award, Xinlong! 🍀",
+      "Every second of your performance leaves us in complete awe. Best main dancer in the world ✨",
+      "Hard work never betrays talent! Congratulations to Xinlong on bringing home his first solo trophy 💖",
+      "Celebrating Xinlong's big win tonight! You were born to rule the stage as an all-rounder 🔥",
+      "To our ace Xinlong: thank you for always giving 100% on stage. This award is entirely yours 🏆",
+      "Witnessing your first solo trophy makes this night truly unforgettable. We love you so much, Xinlong 🌟",
+      "Your dynamic dance moves and commanding stage presence continue to break records. Congrats! 🤍",
+      "The true embodiment of dedication and artistic growth. Congratulations on the KGMA award, Xinlong! 🎉",
+      "From your powerful dance breaks to your sweet smile, you are perfection. Proud of our main dancer 🍀",
+      "Congratulations on your well-deserved first trophy! The future belongs to all-rounder Xinlong ✨",
+      "An exceptional performer who elevates every single stage. So proud of you, our ace! 💖",
+      "Hardworking, humble, and insanely talented. Congratulations on winning the Best Popularity Award! 🏆",
+      "Xinlong's stage dominance is proof of his unmatched dedication. Keep shining bright, main dancer 🔥",
+      "Your first solo trophy is a testament to the endless love from fans and your unwavering commitment 🌟",
+      "Vocals, performance, and presence—an all-rounder through and through! Congratulations, Xinlong 🤍",
+      "Here’s to celebrating Xinlong’s well-earned KGMA Popularity Award! You deserve the world 🎉",
+      "Watching you hold your first individual trophy is an absolute dream come true. So proud of our ace! 🍀",
+      "A master of the stage whose passion never wavers. Congratulations to our main dancer Xinlong ✨",
+      "True artistry is born from relentless effort. Congratulations on this historic milestone, Xinlong! 💖",
+      "The whole world is discovering the talent of our all-rounder ace. Well done, Xinlong! 🏆",
+      "Celebrating the first of many trophies to come! Congratulations on your KGMA Best Popularity Award 🔥",
+      "Your flawless technique and expressive dancing always leave us speechless. Proud of our main dancer 🌟",
+      "Dedication, resilience, and brilliance define you. Congratulations on your first solo trophy, Xinlong! 🤍",
+      "An ace who lights up every room and commands every stage. So proud of your achievement today 🎉",
+      "Thank you for your ceaseless dedication to your craft. Congratulations on your KGMA trophy, Xinlong! 🍀",
+      "Your first individual trophy is here! Always by your side, forever supporting our ace Xinlong ✨"
+    ]
+  };
+
+  let currentLang = 'all';
+  const tweetTextarea = document.getElementById('tweetContent');
+  const hashtagInput = document.getElementById('hashtagInput');
+  const charCount = document.getElementById('charCount');
+
+  function setLanguage(lang, btnElement) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    btnElement.classList.add('active');
+    generateNewPost();
+  }
+
+  function getRandomPhrase() {
+    let pool = [];
+    if (currentLang === 'all') {
+      pool = [...phrases.ko, ...phrases.ja, ...phrases.en];
+    } else {
+      pool = phrases[currentLang] || [];
+    }
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function generateNewPost() {
+    const text = getRandomPhrase();
+    const tags = hashtagInput.value.trim();
+    tweetTextarea.value = tags ? `${text}\n\n${tags}` : text;
+    updateCharCount();
+  }
+
+  function updateCharCount() {
+    charCount.textContent = `${tweetTextarea.value.length} 字`;
+  }
+  tweetTextarea.addEventListener('input', updateCharCount);
+
+  function jumpToX() {
+    const content = tweetTextarea.value.trim();
+    if (!content) {
+      alert("請先生成或輸入推文內容！");
+      return;
+    }
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(content)}`;
+    window.open(tweetUrl, '_blank');
+  }
+
+  function copyTweet() {
+    if (!tweetTextarea.value.trim()) return;
+    navigator.clipboard.writeText(tweetTextarea.value).then(() => {
+      showToast("已複製到剪貼簿！");
+    }).catch(() => {
+      tweetTextarea.select();
+      document.execCommand('copy');
+      showToast("已複製到剪貼簿！");
+    });
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 1800);
+  }
+
+  generateNewPost();
+</script>
+
+</body>
+</html>
